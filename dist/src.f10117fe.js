@@ -117,7 +117,42 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/views/View.ts":[function(require,module,exports) {
+})({"src/views/CollectionView.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CollectionView = void 0;
+
+var CollectionView =
+/** @class */
+function () {
+  function CollectionView(parent, collection) {
+    this.parent = parent;
+    this.collection = collection;
+  }
+
+  CollectionView.prototype.render = function () {
+    this.parent.innerHTML = '';
+    var templateElement = document.createElement('template');
+
+    for (var _i = 0, _a = this.collection.models; _i < _a.length; _i++) {
+      var model = _a[_i];
+      var itemParent = document.createElement('div');
+      this.renderItem(model, itemParent);
+      templateElement.content.append(itemParent);
+      console.log(templateElement.outerHTML);
+    }
+
+    this.parent.append(templateElement.content);
+  };
+
+  return CollectionView;
+}();
+
+exports.CollectionView = CollectionView;
+},{}],"src/views/View.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -198,92 +233,7 @@ function () {
 }();
 
 exports.View = View;
-},{}],"src/views/UserForm.ts":[function(require,module,exports) {
-"use strict";
-
-var __extends = this && this.__extends || function () {
-  var _extendStatics = function extendStatics(d, b) {
-    _extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) {
-        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-      }
-    };
-
-    return _extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-
-    _extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.UserForm = void 0;
-
-var View_1 = require("./View");
-
-var UserForm =
-/** @class */
-function (_super) {
-  __extends(UserForm, _super);
-
-  function UserForm() {
-    var _this = _super !== null && _super.apply(this, arguments) || this;
-
-    _this.onSaveClick = function () {
-      _this.model.save();
-    };
-
-    _this.onSetAgeClick = function () {
-      _this.model.setRandomAge();
-    };
-
-    _this.onSetNameClick = function () {
-      var input = _this.parent.querySelector('input');
-
-      if (input) {
-        var name = input.value;
-
-        _this.model.set({
-          name: name
-        });
-      }
-    };
-
-    return _this;
-  }
-
-  UserForm.prototype.eventsMap = function () {
-    return {
-      'click:.set-age': this.onSetAgeClick,
-      'click:.set-name': this.onSetNameClick,
-      'click:.save-model': this.onSaveClick
-    };
-  };
-
-  UserForm.prototype.template = function () {
-    return "\n            <div>\n                <input placeholder=\"" + this.model.get('name') + "\"/>\n                <button class=\"set-name\">Change Name</button>\n                <button class=\"set-age\">Set Random Age</button>\n                <button class=\"save-model\">Save User</button>\n            </div>\n        ";
-  };
-
-  return UserForm;
-}(View_1.View);
-
-exports.UserForm = UserForm;
-},{"./View":"src/views/View.ts"}],"src/views/UserShow.ts":[function(require,module,exports) {
+},{}],"src/views/UserShow.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -338,7 +288,7 @@ function (_super) {
 }(View_1.View);
 
 exports.UserShow = UserShow;
-},{"./View":"src/views/View.ts"}],"src/views/UserEdit.ts":[function(require,module,exports) {
+},{"./View":"src/views/View.ts"}],"src/views/UserList.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -372,44 +322,30 @@ var __extends = this && this.__extends || function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.UserEdit = void 0;
+exports.UserList = void 0;
 
-var View_1 = require("./View");
-
-var UserForm_1 = require("./UserForm");
+var CollectionView_1 = require("./CollectionView");
 
 var UserShow_1 = require("./UserShow");
 
-var UserEdit =
+var UserList =
 /** @class */
 function (_super) {
-  __extends(UserEdit, _super);
+  __extends(UserList, _super);
 
-  function UserEdit() {
+  function UserList() {
     return _super !== null && _super.apply(this, arguments) || this;
   }
 
-  UserEdit.prototype.regionsMap = function () {
-    return {
-      userShow: '.user-show',
-      userForm: '.user-form'
-    };
+  UserList.prototype.renderItem = function (model, itemParent) {
+    new UserShow_1.UserShow(itemParent, model).render();
   };
 
-  UserEdit.prototype.onRender = function () {
-    new UserShow_1.UserShow(this.regions.userShow, this.model).render();
-    new UserForm_1.UserForm(this.regions.userForm, this.model).render();
-  };
+  return UserList;
+}(CollectionView_1.CollectionView);
 
-  UserEdit.prototype.template = function () {
-    return "\n            <div>\n                <div class=\"user-show\"></div>\n                <div class=\"user-form\"></div>\n            </div>\n        ";
-  };
-
-  return UserEdit;
-}(View_1.View);
-
-exports.UserEdit = UserEdit;
-},{"./View":"src/views/View.ts","./UserForm":"src/views/UserForm.ts","./UserShow":"src/views/UserShow.ts"}],"src/models/Model.ts":[function(require,module,exports) {
+exports.UserList = UserList;
+},{"./CollectionView":"src/views/CollectionView.ts","./UserShow":"src/views/UserShow.ts"}],"src/models/Model.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2378,6 +2314,149 @@ exports.Eventing = Eventing;
 },{}],"src/models/Collection.ts":[function(require,module,exports) {
 "use strict";
 
+var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function (resolve) {
+      resolve(value);
+    });
+  }
+
+  return new (P || (P = Promise))(function (resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function step(result) {
+      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+    }
+
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+};
+
+var __generator = this && this.__generator || function (thisArg, body) {
+  var _ = {
+    label: 0,
+    sent: function sent() {
+      if (t[0] & 1) throw t[1];
+      return t[1];
+    },
+    trys: [],
+    ops: []
+  },
+      f,
+      y,
+      t,
+      g;
+  return g = {
+    next: verb(0),
+    "throw": verb(1),
+    "return": verb(2)
+  }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
+    return this;
+  }), g;
+
+  function verb(n) {
+    return function (v) {
+      return step([n, v]);
+    };
+  }
+
+  function step(op) {
+    if (f) throw new TypeError("Generator is already executing.");
+
+    while (_) {
+      try {
+        if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+        if (y = 0, t) op = [op[0] & 2, t.value];
+
+        switch (op[0]) {
+          case 0:
+          case 1:
+            t = op;
+            break;
+
+          case 4:
+            _.label++;
+            return {
+              value: op[1],
+              done: false
+            };
+
+          case 5:
+            _.label++;
+            y = op[1];
+            op = [0];
+            continue;
+
+          case 7:
+            op = _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+
+          default:
+            if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+              _ = 0;
+              continue;
+            }
+
+            if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+              _.label = op[1];
+              break;
+            }
+
+            if (op[0] === 6 && _.label < t[1]) {
+              _.label = t[1];
+              t = op;
+              break;
+            }
+
+            if (t && _.label < t[2]) {
+              _.label = t[2];
+
+              _.ops.push(op);
+
+              break;
+            }
+
+            if (t[2]) _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+        }
+
+        op = body.call(thisArg, _);
+      } catch (e) {
+        op = [6, e];
+        y = 0;
+      } finally {
+        f = t = 0;
+      }
+    }
+
+    if (op[0] & 5) throw op[1];
+    return {
+      value: op[0] ? op[1] : void 0,
+      done: true
+    };
+  }
+};
+
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -2419,14 +2498,30 @@ function () {
   });
 
   Collection.prototype.fetch = function () {
-    var _this = this;
+    return __awaiter(this, void 0, Promise, function () {
+      var response;
 
-    axios_1.default.get(this.rootUrl).then(function (response) {
-      response.data.forEach(function (value) {
-        _this.models.push(_this.deserialize(value));
+      var _this = this;
+
+      return __generator(this, function (_a) {
+        switch (_a.label) {
+          case 0:
+            return [4
+            /*yield*/
+            , axios_1.default.get(this.rootUrl)];
+
+          case 1:
+            response = _a.sent();
+            response.data.forEach(function (value) {
+              _this.models.push(_this.deserialize(value));
+            });
+            this.trigger('change');
+            return [2
+            /*return*/
+            ];
+        }
       });
     });
-    this.trigger('fetch');
   };
 
   return Collection;
@@ -2518,23 +2613,37 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var UserEdit_1 = require("./views/UserEdit");
+var UserList_1 = require("./views/UserList"); //import { UserEdit} from './views/UserEdit';
+
 
 var User_1 = require("./models/User");
 
-var user = User_1.User.buildUser({
-  name: 'NAME',
-  age: 21
-});
-var root = document.getElementById('root');
+var Collection_1 = require("./models/Collection");
 
-if (root) {
-  var userEdit = new UserEdit_1.UserEdit(root, user);
-  userEdit.render();
-} else {
-  throw new Error('Root element not found');
-}
-},{"./views/UserEdit":"src/views/UserEdit.ts","./models/User":"src/models/User.ts"}],"../../.nvm/versions/node/v14.16.1/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var users = new Collection_1.Collection('http://localhost:3000/users', function (json) {
+  return User_1.User.buildUser(json);
+});
+users.on('change', function () {
+  var root = document.getElementById('root');
+
+  if (root) {
+    var userList = new UserList_1.UserList(root, users);
+    userList.render();
+    console.log(userList.parent.outerHTML);
+  }
+});
+users.fetch(); // const user = User.buildUser({name: 'NAME', age: 21})
+// const root = document.getElementById('root')
+// if(root){
+//     const userEdit = new UserEdit(
+//         root,
+//         user
+//     )
+//     userEdit.render()
+// }else{
+//     throw new Error('Root element not found')
+// }
+},{"./views/UserList":"src/views/UserList.ts","./models/User":"src/models/User.ts","./models/Collection":"src/models/Collection.ts"}],"../../.nvm/versions/node/v14.16.1/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2562,7 +2671,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33945" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37937" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
